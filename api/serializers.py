@@ -1,20 +1,19 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers, status
 from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
 
 from api.models import Movie, Rating, Evaluation, Languages, AcquiredSkillSetData, ImplementedSkillSetData, UserData, \
     HighSchool, HigherSecondary, HigherSecEqDiploma, Graduation, PostGraduation, OtherDiploma, OtherQualification, \
-    Education, ExperienceData, DocumentsData, PresentAddressData, PermanentAddressData, AddressData
+    Education, ExperienceData, DocumentsData, PresentAddressData, PermanentAddressData, AddressData, User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserMiniSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = (
             'id',
             'username',
-            'password'  # password needs to be hashed
+            'password',  # password needs to be hashed
         )
         extra_kwargs = {
             'password': {
@@ -27,6 +26,18 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         Token.objects.create(user=user)
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+        extra_kwargs = {
+            'password': {
+                'write_only': True,
+                'required': True
+            }
+        }
 
 
 class MovieSerializer(serializers.ModelSerializer):

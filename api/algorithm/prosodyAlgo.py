@@ -571,6 +571,12 @@ def finalEvaluation(m, p):
         final_predictions.update({'Carl Model': predictions[0]})  # [0] first element of ndarray
         print("Carl Model with 58% accuracy    ", predictions)
 
+        filename = p + "/" + "dataset" + "/" + "essen" + "/" + "ETC_model.sav"
+        model = pickle.load(open(filename, 'rb'))
+        predictions = model.predict(x)
+        final_predictions.update({'ETC Model': predictions[0]})  # [0] first element of ndarray
+        print("ETC Model with XX% accuracy    ", predictions)
+
         filename = p + "/" + "dataset" + "/" + "essen" + "/" + "KNN_model.sav"
         model = pickle.load(open(filename, 'rb'))
         predictions = model.predict(x)

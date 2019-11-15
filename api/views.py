@@ -1,30 +1,35 @@
 import os
 
-from django.contrib.auth.models import User
-from django.shortcuts import render
-from django.core.files.storage import FileSystemStorage
-
-# Create your views here.
 from rest_framework import viewsets, status
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.utils import json
 
-from api.models import Movie, Rating, Evaluation, AcquiredSkillSetData, ImplementedSkillSetData, UserData, HighSchool
-from api.serializers import MovieSerializer, RatingSerializer, UserSerializer, EvaluationSerializer, \
-    AcquiredSkillSetDataSerializer, ImplementedSkillSetDataSerializer, UserDataSerializer, HighSchoolSerializer
+from api.models import Movie, Rating, Evaluation, AcquiredSkillSetData, ImplementedSkillSetData, UserData, HighSchool, \
+    AddressData, PresentAddressData, PermanentAddressData
+from api.serializers import MovieSerializer, RatingSerializer, UserMiniSerializer, EvaluationSerializer, \
+    AcquiredSkillSetDataSerializer, ImplementedSkillSetDataSerializer, UserDataSerializer, HighSchoolSerializer, \
+    AddressSerializer, PermanentAddressSerializer, PresentAddressSerializer, User
 
 from api.algorithm.pronunciationEvaluation import pronunciationService
 from iboxz.settings import AUDIO_ROOT
 
-import jsonpickle
+# Create your views here.
+
+
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        response = super(CustomAuthToken, self).post(request, *args, **kwargs)
+        token = Token.objects.get(key=response.data['token'])
+        return Response({'id': token.user_id, 'token': token.key})
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserMiniSerializer
     permission_classes = (AllowAny,)
 
 
@@ -157,5 +162,69 @@ class UserDataViewSet(viewsets.ModelViewSet):
 class HighSchoolViewSet(viewsets.ModelViewSet):
     queryset = HighSchool.objects.all()
     serializer_class = HighSchoolSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+
+def changeAddressData(savefrom, saveto):
+    saveto.addressLine1 = savefrom.addressLine1
+    saveto.addressLine2 = savefrom.addressLine2
+    saveto.city = savefrom.city
+    saveto.state = savefrom.state
+    saveto.zipCode = savefrom.zipCode
+    saveto.country = savefrom.country
+    return saveto
+
+
+class AddressViewSet(viewsets.ModelViewSet):
+    queryset = AddressData.objects.all()
+    serializer_class = AddressSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    @action(detail=True, methods=['POST'])
+    def save_address(self, request, pk=None):
+        if 'permanentAddress' and 'presentAddress' in request.data:
+            user = User.objects.get(id=pk)
+            permanentAddressData = request.data['permanentAddress']
+            presentAddressData = request.data['presentAddress']
+
+            try:
+                address = AddressData.objects.get(user=user.id)
+                permanentAddress = changeAddressData(permanentAddressData,
+                                                     PermanentAddressData.objects.get(user=user.id))
+                presentAddress = changeAddressData(presentAddressData, PresentAddressData.objects.get(user=user.id))
+                address.presentAddress = presentAddress
+                address.permanentAddress = permanentAddress
+                serializer = AddressSerializer(address, many=False)
+                response = {'message': 'Address Updated', 'result': serializer.data}
+                return Response(response, status=status.HTTP_200_OK)
+            except:
+                permanentAddress = changeAddressData(permanentAddressData,
+                                                     PermanentAddressData.objects.create(user=user))
+                presentAddress = changeAddressData(presentAddressData, PresentAddressData.objects.create(user=user))
+                address = AddressData.objects.create(
+                    user=user,
+                    permanentAddress=permanentAddress,
+                    presentAddress=presentAddress
+                )
+                serializer = AddressSerializer(address, many=False)
+                response = {'message': 'Address Saved', 'result': serializer.data}
+                return Response(response, status=status.HTTP_200_OK)
+        else:
+            response = {'message': 'Address Data Needed'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PermanentAddressViewSet(viewsets.ModelViewSet):
+    queryset = PermanentAddressData.objects.all()
+    serializer_class = PermanentAddressSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+
+class PresentAddressViewSet(viewsets.ModelViewSet):
+    queryset = PresentAddressData.objects.all()
+    serializer_class = PresentAddressSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)

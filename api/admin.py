@@ -1,11 +1,11 @@
 from django.contrib import admin
 from api.models import Movie, Rating, Evaluation, ImplementedSkillSetData, AcquiredSkillSetData, UserData, Education, \
     AddressData, Languages, ExperienceData, PresentAddressData, PermanentAddressData, HighSchool, HigherSecondary, \
-    HigherSecEqDiploma, Graduation, PostGraduation, OtherDiploma, OtherQualification, DocumentsData
+    HigherSecEqDiploma, Graduation, PostGraduation, OtherDiploma, OtherQualification, DocumentsData, User
 
 # Register your models here.
 
-
+admin.site.register(User)
 admin.site.register(Movie)
 admin.site.register(Rating)
 admin.site.register(Evaluation)

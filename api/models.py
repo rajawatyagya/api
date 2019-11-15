@@ -1,15 +1,32 @@
 import collections
+import datetime
 from uuid import uuid4
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.postgres.fields import JSONField, ArrayField
 import os
 
 # Create your models here.
 from django.utils.deconstruct import deconstructible
+from rest_framework.authtoken.models import Token
 
 from iboxz.settings import BASE_DIR, AUDIO_ROOT, MEDIA_ROOT
+
+
+class User(AbstractUser):
+    dateOfBirth = models.DateField(
+        default=datetime.date.today
+    )
+    middleName = models.CharField(
+        max_length=32,
+        default=''
+    )
+
+    objects = UserManager()
+
+    def __str__(self):
+        return str(self.username)
 
 
 @deconstructible
@@ -287,50 +304,88 @@ class Education(models.Model):
 
 
 class PermanentAddressData(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
     addressLine1 = models.TextField(
-        max_length=256
+        max_length=256,
+        blank=True,
+        null=True
     )
     addressLine2 = models.TextField(
-        max_length=256
+        max_length=256,
+        blank=True,
+        null=True
     )
     city = models.CharField(
-        max_length=32
+        max_length=32,
+        blank=True,
+        null=True
     )
     state = models.CharField(
-        max_length=32
+        max_length=32,
+        blank=True,
+        null=True
     )
-    zipCode = models.IntegerField()
+    zipCode = models.IntegerField(
+        blank=True,
+        null=True
+    )
     country = models.CharField(
-        max_length=32
+        max_length=32,
+        blank=True,
+        null=True
     )
 
     def __str__(self):
-        return str(self.state)
+        return str(self.user.username)
 
 
 class PresentAddressData(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
     addressLine1 = models.TextField(
-        max_length=256
+        max_length=256,
+        blank=True,
+        null=True
     )
     addressLine2 = models.TextField(
-        max_length=256
+        max_length=256,
+        blank=True,
+        null=True
     )
     city = models.CharField(
-        max_length=32
+        max_length=32,
+        blank=True,
+        null=True
     )
     state = models.CharField(
-        max_length=32
+        max_length=32,
+        blank=True,
+        null=True
     )
-    zipCode = models.IntegerField()
+    zipCode = models.IntegerField(
+        blank=True,
+        null=True
+    )
     country = models.CharField(
-        max_length=32
+        max_length=32,
+        blank=True,
+        null=True
     )
 
     def __str__(self):
-        return str(self.city)
+        return str(self.user.username)
 
 
 class AddressData(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
     permanentAddress = models.OneToOneField(
         PermanentAddressData,
         on_delete=models.CASCADE,
@@ -348,7 +403,7 @@ class AddressData(models.Model):
     )
 
     def __str__(self):
-        return str(self.pk)
+        return str(self.user.username)
 
 
 class UserData(models.Model):
@@ -356,25 +411,14 @@ class UserData(models.Model):
         User,
         on_delete=models.CASCADE
     )
-    email = models.EmailField(
-        max_length=128
-    )
-    mobile = models.IntegerField()
-    dob = models.DateField()
-    firstName = models.CharField(
-        max_length=32
-    )
-    middleName = models.CharField(
-        max_length=32
-    )
-    lastName = models.CharField(
-        max_length=32
-    )
     fatherFirstName = models.CharField(
         max_length=32
     )
     fatherMiddleName = models.CharField(
-        max_length=32
+        max_length=32,
+        blank=True,
+        null=True,
+        default=''
     )
     fatherLastName = models.CharField(
         max_length=32
@@ -422,7 +466,7 @@ class UserData(models.Model):
     )
 
     def __str__(self):
-        return str(self.firstName)
+        return str(self.user.email)
 
 
 class Movie(models.Model):
