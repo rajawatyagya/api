@@ -2,23 +2,23 @@ from django.urls import path
 from rest_framework import routers
 from django.conf.urls import include
 
-from api.views import MovieViewSet, RatingViewSet, UserViewSet, EvaluationJSONViewSet, \
-    ImplementedSkillSetDataViewSet, AcquiredSkillSetDataViewSet, UserDataViewSet, HighSchoolViewSet, AddressViewSet, \
-    PermanentAddressViewSet, PresentAddressViewSet
+from api import views
 
 router = routers.DefaultRouter()
 
-router.register('users', UserViewSet)
-router.register('movies', MovieViewSet)
-router.register('ratings', RatingViewSet)
-router.register('evaluation', EvaluationJSONViewSet)
-router.register('implementedSkillSetData', ImplementedSkillSetDataViewSet)
-router.register('acquiredSkillSetData', AcquiredSkillSetDataViewSet)
-router.register('userData', UserDataViewSet)
-router.register('highSchool', HighSchoolViewSet)
-router.register('address', AddressViewSet)
-router.register('permanentAddress', PermanentAddressViewSet)
-router.register('presentAddress', PresentAddressViewSet)
+router.register('users', views.UserViewSet)
+router.register('movies', views.MovieViewSet)
+router.register('ratings', views.RatingViewSet)
+router.register('evaluation', views.EvaluationJSONViewSet)
+router.register('implementedSkillSetData', views.ImplementedSkillSetDataViewSet)
+router.register('acquiredSkillSetData', views.AcquiredSkillSetDataViewSet)
+router.register('candidate', views.CandidateViewSet)
+router.register('recruiter', views.RecruiterViewSet)
+router.register('education', views.EducationViewSet)
+router.register('address', views.AddressViewSet)
+router.register('languages', views.LanguagesViewSet)
+router.register('experience', views.ExperienceViewSet)
+router.register('activity', views.FollowViewSet)
 
 urlpatterns = [
     path('', include(router.urls))

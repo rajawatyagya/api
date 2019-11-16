@@ -1,28 +1,17 @@
 from django.contrib import admin
-from api.models import Movie, Rating, Evaluation, ImplementedSkillSetData, AcquiredSkillSetData, UserData, Education, \
-    AddressData, Languages, ExperienceData, PresentAddressData, PermanentAddressData, HighSchool, HigherSecondary, \
-    HigherSecEqDiploma, Graduation, PostGraduation, OtherDiploma, OtherQualification, DocumentsData, User
+from api import models
 
 # Register your models here.
 
-admin.site.register(User)
-admin.site.register(Movie)
-admin.site.register(Rating)
-admin.site.register(Evaluation)
-admin.site.register(ImplementedSkillSetData)
-admin.site.register(AcquiredSkillSetData)
-admin.site.register(UserData)
-admin.site.register(Education)
-admin.site.register(AddressData)
-admin.site.register(Languages)
-admin.site.register(ExperienceData)
-admin.site.register(PresentAddressData)
-admin.site.register(PermanentAddressData)
-admin.site.register(HighSchool)
-admin.site.register(HigherSecondary)
-admin.site.register(HigherSecEqDiploma)
-admin.site.register(Graduation)
-admin.site.register(PostGraduation)
-admin.site.register(OtherDiploma)
-admin.site.register(OtherQualification)
-admin.site.register(DocumentsData)
+admin.site.register(models.User)
+admin.site.register(models.Movie)
+admin.site.register(models.Rating)
+admin.site.register(models.Evaluation)
+admin.site.register(models.ImplementedSkillSetData)
+admin.site.register(models.AcquiredSkillSetData)
+admin.site.register(models.Candidate)
+admin.site.register(models.Education)
+admin.site.register(models.AddressData)
+admin.site.register(models.Languages)
+admin.site.register(models.Experience)
+admin.site.register(models.Follow)

@@ -84,7 +84,7 @@ AUTH_USER_MODEL = "api.User"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3',
+        'NAME': 'db-old.sqlite3',
         # 'USER': 'iboxz_db_admin',
         # 'PASSWORD': 'chigga@2020',
         # 'HOST': 'localhost',

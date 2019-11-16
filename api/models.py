@@ -1,28 +1,28 @@
-import collections
 import datetime
 from uuid import uuid4
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.contrib.postgres.fields import JSONField, ArrayField
+from django.contrib.postgres.fields import JSONField
+from django.utils.deconstruct import deconstructible
 import os
 
 # Create your models here.
-from django.utils.deconstruct import deconstructible
-from rest_framework.authtoken.models import Token
-
-from iboxz.settings import BASE_DIR, AUDIO_ROOT, MEDIA_ROOT
+from iboxz.settings import MEDIA_ROOT
 
 
 class User(AbstractUser):
     dateOfBirth = models.DateField(
         default=datetime.date.today
     )
-    middleName = models.CharField(
+    middle_name = models.CharField(
         max_length=32,
         default=''
     )
-
+    type = models.CharField(
+        max_length=32,
+        default='candidate'
+    )
     objects = UserManager()
 
     def __str__(self):
@@ -47,338 +47,42 @@ class UploadToPathAndRename(object):
         return os.path.join(self.sub_path, filename)
 
 
-class HighSchool(models.Model):
-    courseTitle = 'High School'
-    institute = models.TextField(
-        max_length=250
-    )
-    college = models.CharField(
-        max_length=32
-    )
-    department = models.CharField(
-        max_length=32
-    )
-    degree = models.CharField(
-        max_length=32
-    )
-    startDate = models.DateField()
-    endDate = models.DateField()
-    type = models.CharField(
-        max_length=32
-    )
-    percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2
-    )
-
-    def __str__(self):
-        return str(self.department)
-
-
-class HigherSecondary(models.Model):
-    courseTitle = models.CharField(
-        max_length=32
-    )
-    institute = models.TextField(
-        max_length=250
-    )
-    college = models.CharField(
-        max_length=32
-    )
-    department = models.CharField(
-        max_length=32
-    )
-    degree = models.CharField(
-        max_length=32
-    )
-    startDate = models.DateField()
-    endDate = models.DateField()
-    type = models.CharField(
-        max_length=32
-    )
-    percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2
-    )
-
-    def __str__(self):
-        return str(self.courseTitle)
-
-
-class HigherSecEqDiploma(models.Model):
-    courseTitle = models.CharField(
-        max_length=32
-    )
-    institute = models.TextField(
-        max_length=250
-    )
-    college = models.CharField(
-        max_length=32
-    )
-    department = models.CharField(
-        max_length=32
-    )
-    degree = models.CharField(
-        max_length=32
-    )
-    startDate = models.DateField()
-    endDate = models.DateField()
-    type = models.CharField(
-        max_length=32
-    )
-    percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2
-    )
-
-    def __str__(self):
-        return str(self.courseTitle)
-
-
-class Graduation(models.Model):
-    courseTitle = models.CharField(
-        max_length=32
-    )
-    institute = models.TextField(
-        max_length=250
-    )
-    college = models.CharField(
-        max_length=32
-    )
-    department = models.CharField(
-        max_length=32
-    )
-    degree = models.CharField(
-        max_length=32
-    )
-    startDate = models.DateField()
-    endDate = models.DateField()
-    type = models.CharField(
-        max_length=32
-    )
-    percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2
-    )
-
-    def __str__(self):
-        return str(self.courseTitle)
-
-
-class PostGraduation(models.Model):
-    courseTitle = models.CharField(
-        max_length=32
-    )
-    institute = models.TextField(
-        max_length=250
-    )
-    college = models.CharField(
-        max_length=32
-    )
-    department = models.CharField(
-        max_length=32
-    )
-    degree = models.CharField(
-        max_length=32
-    )
-    startDate = models.DateField()
-    endDate = models.DateField()
-    type = models.CharField(
-        max_length=32
-    )
-    percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2
-    )
-
-    def __str__(self):
-        return str(self.courseTitle)
-
-
-class OtherDiploma(models.Model):
-    courseTitle = models.CharField(
-        max_length=32
-    )
-    institute = models.TextField(
-        max_length=250
-    )
-    college = models.CharField(
-        max_length=32
-    )
-    department = models.CharField(
-        max_length=32
-    )
-    degree = models.CharField(
-        max_length=32
-    )
-    startDate = models.DateField()
-    endDate = models.DateField()
-    type = models.CharField(
-        max_length=32
-    )
-    percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2
-    )
-
-    def __str__(self):
-        return str(self.courseTitle)
-
-
-class OtherQualification(models.Model):
-    courseTitle = models.CharField(
-        max_length=32
-    )
-    institute = models.TextField(
-        max_length=250
-    )
-    college = models.CharField(
-        max_length=32
-    )
-    department = models.CharField(
-        max_length=32
-    )
-    degree = models.CharField(
-        max_length=32
-    )
-    startDate = models.DateField()
-    endDate = models.DateField()
-    type = models.CharField(
-        max_length=32
-    )
-    percentage = models.DecimalField(
-        max_digits=5,
-        decimal_places=2
-    )
-
-    def __str__(self):
-        return str(self.courseTitle)
-
-
 class Education(models.Model):
-    highSchool = models.OneToOneField(
-        HighSchool,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
-    higherSecondary = models.OneToOneField(
-        HigherSecondary,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
-    higherSecEqDiploma = models.OneToOneField(
-        HigherSecEqDiploma,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
-    graduation = models.OneToOneField(
-        Graduation,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
-    postGraduation = models.OneToOneField(
-        PostGraduation,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
-    otherDiploma = models.OneToOneField(
-        OtherDiploma,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
-    otherQualification = models.OneToOneField(
-        OtherQualification,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
-
-    def __str__(self):
-        return str(self.pk)
-
-
-class PermanentAddressData(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE
     )
-    addressLine1 = models.TextField(
-        max_length=256,
-        blank=True,
-        null=True
-    )
-    addressLine2 = models.TextField(
-        max_length=256,
-        blank=True,
-        null=True
-    )
-    city = models.CharField(
+    courseType = models.CharField(
         max_length=32,
-        blank=True,
-        null=True
+        default=''
     )
-    state = models.CharField(
-        max_length=32,
-        blank=True,
-        null=True
+    courseTitle = models.CharField(
+        max_length=32
     )
-    zipCode = models.IntegerField(
-        blank=True,
-        null=True
+    institute = models.TextField(
+        max_length=250
     )
-    country = models.CharField(
-        max_length=32,
-        blank=True,
-        null=True
+    college = models.CharField(
+        max_length=32
+    )
+    department = models.CharField(
+        max_length=32
+    )
+    degree = models.CharField(
+        max_length=32
+    )
+    startDate = models.DateField()
+    endDate = models.DateField()
+    type = models.CharField(
+        max_length=32
+    )
+    percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=2
     )
 
     def __str__(self):
-        return str(self.user.username)
-
-
-class PresentAddressData(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )
-    addressLine1 = models.TextField(
-        max_length=256,
-        blank=True,
-        null=True
-    )
-    addressLine2 = models.TextField(
-        max_length=256,
-        blank=True,
-        null=True
-    )
-    city = models.CharField(
-        max_length=32,
-        blank=True,
-        null=True
-    )
-    state = models.CharField(
-        max_length=32,
-        blank=True,
-        null=True
-    )
-    zipCode = models.IntegerField(
-        blank=True,
-        null=True
-    )
-    country = models.CharField(
-        max_length=32,
-        blank=True,
-        null=True
-    )
-
-    def __str__(self):
-        return str(self.user.username)
+        return str(self.courseType)
 
 
 class AddressData(models.Model):
@@ -386,30 +90,53 @@ class AddressData(models.Model):
         User,
         on_delete=models.CASCADE
     )
-    permanentAddress = models.OneToOneField(
-        PermanentAddressData,
-        on_delete=models.CASCADE,
+    addressLine1 = models.TextField(
+        max_length=256,
         blank=True,
         null=True
     )
-    presentAddress = models.OneToOneField(
-        PresentAddressData,
-        on_delete=models.CASCADE,
+    addressLine2 = models.TextField(
+        max_length=256,
         blank=True,
         null=True
     )
-    checked = models.BooleanField(
-        default=False
+    city = models.CharField(
+        max_length=32,
+        blank=True,
+        null=True
+    )
+    state = models.CharField(
+        max_length=32,
+        blank=True,
+        null=True
+    )
+    zipCode = models.IntegerField(
+        blank=True,
+        null=True
+    )
+    country = models.CharField(
+        max_length=32,
+        blank=True,
+        null=True
+    )
+    type = models.CharField(
+        max_length=32,
+        blank=True,
+        null=True,
+        default='permanent'
     )
 
     def __str__(self):
         return str(self.user.username)
 
 
-class UserData(models.Model):
+class Candidate(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE
+    )
+    mobile = models.IntegerField(
+        default=0
     )
     fatherFirstName = models.CharField(
         max_length=32
@@ -422,18 +149,6 @@ class UserData(models.Model):
     )
     fatherLastName = models.CharField(
         max_length=32
-    )
-    education = models.OneToOneField(
-        Education,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
-    )
-    address = models.OneToOneField(
-        AddressData,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
     )
     currentSalary = models.IntegerField()
     expectedSalary = models.IntegerField()
@@ -466,7 +181,47 @@ class UserData(models.Model):
     )
 
     def __str__(self):
-        return str(self.user.email)
+        return str(self.user.username)
+
+
+class Recruiter(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    companyName = models.CharField(
+        max_length=128
+    )
+    recruiterName = models.CharField(
+        max_length=64
+    )
+    designation = models.CharField(
+        max_length=32
+    )
+    industry = models.CharField(
+        max_length=32
+    )
+    department = models.CharField(
+        max_length=32
+    )
+    functionalArea = models.CharField(
+        max_length=32
+    )
+    role = models.CharField(
+        max_length=32
+    )
+    accountType = models.CharField(
+        max_length=32
+    )
+    mobileNumber = models.IntegerField(null=True)
+    landLine = models.IntegerField(null=True)
+    website = models.URLField()
+    about = models.TextField(
+        max_length=256
+    )
+
+    def __str__(self):
+        return str(self.companyName)
 
 
 class Movie(models.Model):
@@ -538,8 +293,8 @@ class Evaluation(models.Model):
 
 
 class Languages(models.Model):
-    userData = models.ForeignKey(
-        UserData,
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
         related_name='languages'
     )
@@ -552,30 +307,12 @@ class Languages(models.Model):
     native = models.BooleanField()
 
     def __str__(self):
-        return str(self.userData.firstName)
+        return str(self.user.first_name)
 
 
-class DocumentsData(models.Model):
-    offerLetter = models.BooleanField(
-        default=False
-    )
-    salarySlip = models.BooleanField(
-        default=False
-    )
-    expOrRelLetter = models.BooleanField(
-        default=False
-    )
-    resignAccept = models.BooleanField(
-        default=False
-    )
-    promotion = models.BooleanField(
-        default=False
-    )
-
-
-class ExperienceData(models.Model):
-    userData = models.ForeignKey(
-        UserData,
+class Experience(models.Model):
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
         related_name='experience'
     )
@@ -606,23 +343,34 @@ class ExperienceData(models.Model):
     startDate = models.DateField()
     endDate = models.DateField()
     duration = models.DurationField()
-    current = models.BooleanField()
+    current = models.BooleanField(
+        default=False
+    )
     salary = models.IntegerField()
     noticePeriod = models.DurationField()
-    documents = models.OneToOneField(
-        DocumentsData,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True
+    offerLetter = models.BooleanField(
+        default=False
+    )
+    salarySlip = models.BooleanField(
+        default=False
+    )
+    expOrRelLetter = models.BooleanField(
+        default=False
+    )
+    resignAccept = models.BooleanField(
+        default=False
+    )
+    promotionLetter = models.BooleanField(
+        default=False
     )
 
     def __str__(self):
-        return str(self.userData.firstName)
+        return str(self.user.username)
 
 
 class ImplementedSkillSetData(models.Model):
     experience = models.ForeignKey(
-        ExperienceData,
+        Experience,
         on_delete=models.CASCADE,
         related_name='implementedSkills'
     )
@@ -639,7 +387,7 @@ class ImplementedSkillSetData(models.Model):
 
 class AcquiredSkillSetData(models.Model):
     experience = models.ForeignKey(
-        ExperienceData,
+        Experience,
         on_delete=models.CASCADE,
         related_name='acquiredSkills'
     )
@@ -652,3 +400,20 @@ class AcquiredSkillSetData(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+
+class Follow(models.Model):
+    following = models.ForeignKey(
+        User,
+        related_name="who_follows",
+        on_delete=models.CASCADE
+    )
+    follower = models.ForeignKey(
+        User,
+        related_name="who_is_followed",
+        on_delete=models.CASCADE
+    )
+    follow_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{} following {} since {}'.format(self.follower, self.following, self.follow_time.date())
