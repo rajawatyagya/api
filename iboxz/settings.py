@@ -93,16 +93,17 @@ AUTH_USER_MODEL = "api.User"
 # }
 
 # [START db_setup]
-if os.getenv('GAE_APPLICATION', None):
+if os.getenv('GAE_INSTANCE', None):
     # Running on production App Engine, so connect to Google Cloud SQL using
     # the unix socket at /cloudsql/<your-cloudsql-connection string>
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'HOST': '/cloudsql/iboxz-database:us-west2:iboxz-db',
-            'NAME': 'iboxz-primary',
+            'NAME': 'iboxz-test',
             'USER': 'iboxz_admin',
             'PASSWORD': 'chigga@2020',
+            'PORT': '5050',
         }
     }
 else:
@@ -166,7 +167,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static'
 
 AUDIO_ROOT = os.path.join(BASE_DIR, 'api', 'algorithm', 'audioData', 'myprosody', 'dataset', 'audioFiles')
