@@ -99,7 +99,7 @@ if os.getenv('IBOXZ_BACKEND', None):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '/cloudsql/iboxz-database:us-west2:iboxz-db',
+            'HOST': '10.127.112.4',
             'NAME': 'iboxz-test',
             'USER': 'iboxz_admin',
             'PASSWORD': 'chigga@2020',
@@ -113,8 +113,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '127.0.0.1',
-            'PORT': '3306',
+            'HOST': '34.94.197.87',
             'NAME': 'iboxz-test',
             'USER': 'iboxz_admin',
             'PASSWORD': 'chigga@2020',
