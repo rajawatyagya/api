@@ -93,7 +93,7 @@ AUTH_USER_MODEL = "api.User"
 # }
 
 # [START db_setup]
-if os.getenv('GAE_INSTANCE', None):
+if os.getenv('IBOXZ_BACKEND', None):
     # Running on production App Engine, so connect to Google Cloud SQL using
     # the unix socket at /cloudsql/<your-cloudsql-connection string>
     DATABASES = {
