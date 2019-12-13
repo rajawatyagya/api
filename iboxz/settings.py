@@ -81,24 +81,54 @@ AUTH_USER_MODEL = "api.User"
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db-old.sqlite3',
-        # 'USER': 'iboxz_db_admin',
-        # 'PASSWORD': 'chigga@2020',
-        # 'HOST': 'localhost',
-        # 'PORT': '',
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'db.sqlite3',
+#         # 'USER': 'iboxz_db_admin',
+#         # 'PASSWORD': 'chigga@2020',
+#         # 'HOST': 'localhost',
+#         # 'PORT': '',
+#     }
+# }
+
+# [START db_setup]
+if os.getenv('GAE_APPLICATION', None):
+    # Running on production App Engine, so connect to Google Cloud SQL using
+    # the unix socket at /cloudsql/<your-cloudsql-connection string>
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'HOST': '/cloudsql/iboxz-database:us-west2:iboxz-db',
+            'NAME': 'iboxz-primary',
+            'USER': 'iboxz_admin',
+            'PASSWORD': 'chigga@2020',
+        }
     }
-}
+else:
+    # Running locally so connect to either a local MySQL instance or connect
+    # to Cloud SQL via the proxy.  To start the proxy via command line:
+    #    $ ./cloud_sql_proxy -instances=iboxz-database:us-west2:iboxz-db=tcp:3306
+    # See https://cloud.google.com/sql/docs/mysql-connect-proxy
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+            'NAME': 'iboxz-test',
+            'USER': 'iboxz_admin',
+            'PASSWORD': 'chigga@2020',
+        }
+    }
+# [END db_setup]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': {
         'rest_framework.permissions.IsAuthenticated'
     },
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ],
 }
 
 # Password validation
