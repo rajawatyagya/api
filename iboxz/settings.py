@@ -103,7 +103,6 @@ if os.getenv('IBOXZ_BACKEND', None):
             'NAME': 'iboxz-test',
             'USER': 'iboxz_admin',
             'PASSWORD': 'chigga@2020',
-            'PORT': '5050',
         }
     }
 else:
