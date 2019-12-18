@@ -7,10 +7,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from djoser import views as djoserView, conf, compat, signals
 
 from api import serializers, models
 from api.algorithm.pronunciationEvaluation import pronunciationService
-from iboxz.settings import AUDIO_ROOT
+from iboxz import settings
 
 
 # Create your views here.
@@ -28,75 +29,61 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.UserMiniSerializer
     permission_classes = (AllowAny,)
 
+    @action(detail=True, methods=['POST'])
+    def get_user(self, request, pk=None):
+        try:
+            user = models.User.objects.get(username=pk)
+            serializer = serializers.UserMiniSerializer(user, many=False)
+            response = {'message': 'Successful', 'result': serializer.data}
+            return Response(response, status=status.HTTP_200_OK)
+        except:
+            response = {'message': 'User does not exist'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
 
-class MovieViewSet(viewsets.ModelViewSet):
-    queryset = models.Movie.objects.all()
-    serializer_class = serializers.MovieSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    @action(detail=True, methods=['POST'])
+    def save_profile_picture(self, request, pk=None):
+        user = models.User.objects.get(username=pk)
+        imageFile = request.data['image']
+        if imageFile and user.user_type == 'candidate':
+            candidate, is_created = models.Candidate.objects.get_or_create(user=user)
+            candidate.image = imageFile
+            candidate.save()
+            serializer = serializers.CandidateImageSerializer(candidate, many=False)
+            if is_created:
+                response = {'message': 'Candidate Profile Created and Profile picture saved successfully', 'result': serializer.data}
+                return Response(response, status=status.HTTP_201_CREATED)
+            else:
+                response = {'message': 'Successful', 'result': serializer.data}
+                return Response(response, status=status.HTTP_202_ACCEPTED)
 
-    @action(detail=True, methods=['POST'])  # detail true means on a specific field
-    def rate_movie(self, request, pk=None):
-        if 'stars' in request.data:
-
-            movie = models.Movie.objects.get(id=pk)
-            stars = request.data['stars']
-            user = request.user
-
-            try:
-                rating = models.Rating.objects.get(user=user.id, movie=movie.id)
-                rating.stars = stars
-                rating.save()
-                serializer = serializers.RatingSerializer(rating, many=False)
-                response = {'message': 'Rating Updated', 'result': serializer.data}
-                return Response(response, status=status.HTTP_200_OK)
-            except:
-                rating = models.Rating.objects.create(user=user, movie=movie, stars=stars)
-                serializer = serializers.RatingSerializer(rating, many=False)
-                response = {'message': 'Rating Created', 'result': serializer.data}
-                return Response(response, status=status.HTTP_200_OK)
-
+        elif imageFile and user.user_type == 'client':
+            response = {'message': 'Recruiter Profile, cannot save image.'}
+            return Response(response, status=status.HTTP_403_FORBIDDEN)
         else:
-            response = {'message': 'stars needed'}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=True, methods=['POST'])  # detail true means on a specific field
-    def compare_random(self, request, pk=None):
-        if 'stars' in request.data:
-
-            movie = models.Movie.objects.get(id=pk)
-            stars = request.data['stars']
-            user = request.user
-
-            try:
-                rating = models.Rating.objects.get(user=user.id, movie=movie.id)
-                comp = rating.stars == stars
-                response = {'message': 'Compared', 'result': comp}
-                return Response(response, status=status.HTTP_200_OK)
-            except:
-                rating = models.Rating.objects.create(user=user, movie=movie, stars=stars)
-                serializer = serializers.RatingSerializer(rating, many=False)
-                response = {'message': 'Rating Created', 'result': serializer.data}
-                return Response(response, status=status.HTTP_200_OK)
-
-        else:
-            response = {'message': 'stars needed'}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            response = {'message': 'Not able to save profile'}
+            return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class RatingViewSet(viewsets.ModelViewSet):
-    queryset = models.Rating.objects.all()
-    serializer_class = serializers.RatingSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+class CustomDjoserUserView(djoserView.UserViewSet):
 
-    def update(self, request, *args, **kwargs):
-        response = {'message': 'you can\'t update ratings like that'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    @action(["post"], detail=False)
+    def activation(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        user.is_active = True
+        user.save()
 
-    def create(self, request, *args, **kwargs):
-        response = {'message': 'you can\'t create ratings like that'}
-        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        signals.user_activated.send(
+            sender=self.__class__, user=user, request=self.request
+        )
+
+        if conf.settings.SEND_CONFIRMATION_EMAIL:
+            context = {"user": user}
+            to = [compat.get_user_email(user)]
+            conf.settings.EMAIL.confirmation(self.request, context).send(to)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class EvaluationJSONViewSet(viewsets.ModelViewSet):
@@ -128,24 +115,10 @@ class EvaluationJSONViewSet(viewsets.ModelViewSet):
 
 
 def handle_audio_file_upload(file, filename):
-    with open(os.path.join(AUDIO_ROOT, filename), 'wb+') as destination:
+    with open(os.path.join(settings.AUDIO_ROOT, filename), 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
     return True
-
-
-class ImplementedSkillSetDataViewSet(viewsets.ModelViewSet):
-    queryset = models.ImplementedSkillSetData.objects.all()
-    serializer_class = serializers.ImplementedSkillSetDataSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-
-
-class AcquiredSkillSetDataViewSet(viewsets.ModelViewSet):
-    queryset = models.AcquiredSkillSetData.objects.all()
-    serializer_class = serializers.AcquiredSkillSetDataSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
 
 
 class CandidateViewSet(viewsets.ModelViewSet):
@@ -186,6 +159,27 @@ class ExperienceViewSet(viewsets.ModelViewSet):
 class RecruiterViewSet(viewsets.ModelViewSet):
     queryset = models.Recruiter.objects.all()
     serializer_class = serializers.RecruiterMiniSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+
+class JobSkillSetViewSet(viewsets.ModelViewSet):
+    queryset = models.JobSkillSet.objects.all()
+    serializer_class = serializers.JobSkillSetSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+
+class JobViewSet(viewsets.ModelViewSet):
+    queryset = models.Job.objects.all()
+    serializer_class = serializers.JobSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+
+class CandidateSkillSetViewSet(viewsets.ModelViewSet):
+    queryset = models.CandidateSkillSet.objects.all()
+    serializer_class = serializers.CandidateSkillSetSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 

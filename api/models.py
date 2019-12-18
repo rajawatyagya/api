@@ -1,14 +1,14 @@
 import datetime
+import os
 from uuid import uuid4
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.postgres.fields import JSONField
 from django.utils.deconstruct import deconstructible
-import os
+from iboxz.settings import MEDIA_ROOT
 
 # Create your models here.
-from iboxz.settings import MEDIA_ROOT
 
 
 class User(AbstractUser):
@@ -19,10 +19,11 @@ class User(AbstractUser):
         max_length=32,
         default=''
     )
-    type = models.CharField(
+    user_type = models.CharField(
         max_length=32,
         default='candidate'
     )
+    REQUIRED_FIELDS = ['user_type', 'email']
     objects = UserManager()
 
     def __str__(self):
@@ -37,12 +38,8 @@ class UploadToPathAndRename(object):
 
     def __call__(self, instance, filename):
         ext = filename.split('.')[-1]
-        # get filename
-        if instance.pk:
-            filename = '{}.{}'.format(instance.pk, ext)
-        else:
-            # set filename as random string
-            filename = '{}.{}'.format(uuid4().hex, ext)
+        # set filename as random string
+        filename = '{}.{}'.format(uuid4().hex, ext)
         # return the whole path to the file
         return os.path.join(self.sub_path, filename)
 
@@ -148,19 +145,23 @@ class Candidate(models.Model):
         default=''
     )
     fatherLastName = models.CharField(
-        max_length=32
+        max_length=32,
+        default=''
     )
-    currentSalary = models.IntegerField()
-    expectedSalary = models.IntegerField()
+    currentSalary = models.IntegerField(null=True)
+    expectedSalary = models.IntegerField(null=True)
     panNumber = models.CharField(
-        max_length=32
+        max_length=32,
+        default=''
     )
-    aadharNumber = models.IntegerField()
+    aadharNumber = models.IntegerField(null=True)
     gender = models.CharField(
-        max_length=10
+        max_length=10,
+        default=''
     )
     message = models.TextField(
-        max_length=256
+        max_length=256,
+        default=''
     )
     image = models.ImageField(
         upload_to=UploadToPathAndRename(os.path.join(MEDIA_ROOT, 'profile')),
@@ -171,13 +172,16 @@ class Candidate(models.Model):
         verbose_name="Resume"
     )
     facebook = models.URLField(
-        max_length=128
+        max_length=128,
+        default=''
     )
     twitter = models.URLField(
-        max_length=128
+        max_length=128,
+        default=''
     )
     linkedIn = models.URLField(
-        max_length=128
+        max_length=128,
+        default=''
     )
 
     def __str__(self):
@@ -222,56 +226,6 @@ class Recruiter(models.Model):
 
     def __str__(self):
         return str(self.companyName)
-
-
-class Movie(models.Model):
-    title = models.CharField(
-        max_length=32
-    )
-    description = models.TextField(
-        max_length=360
-    )
-
-    def number_of_ratings(self):
-        ratings = Rating.objects.filter(movie=self)
-        return len(ratings)
-
-    def avg_rating(self):
-        summation = 0
-        ratings = Rating.objects.filter(movie=self)
-        for rating in ratings:
-            summation += rating.stars
-        if len(ratings) > 0:
-            return summation / len(ratings)
-        else:
-            return 0
-
-    def __str__(self):
-        return str(self.title)
-
-
-class Rating(models.Model):
-    movie = models.ForeignKey(
-        Movie,
-        on_delete=models.CASCADE
-    )
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )
-    stars = models.IntegerField(
-        validators=[
-            MinValueValidator(1),
-            MaxValueValidator(5)
-        ]
-    )
-
-    class Meta:
-        unique_together = (('user', 'movie'),)
-        index_together = (('user', 'movie'),)
-
-    def __str__(self):
-        return str(self.movie)
 
 
 class Evaluation(models.Model):
@@ -368,11 +322,10 @@ class Experience(models.Model):
         return str(self.user.username)
 
 
-class ImplementedSkillSetData(models.Model):
+class CandidateSkillSet(models.Model):
     experience = models.ForeignKey(
         Experience,
-        on_delete=models.CASCADE,
-        related_name='implementedSkills'
+        on_delete=models.CASCADE
     )
     name = models.CharField(
         max_length=32
@@ -380,16 +333,80 @@ class ImplementedSkillSetData(models.Model):
     proficiency = models.CharField(
         max_length=32
     )
+    type = models.CharField(
+        max_length=32,
+        default='implemented'
+    )
 
     def __str__(self):
         return str(self.name)
 
 
-class AcquiredSkillSetData(models.Model):
-    experience = models.ForeignKey(
-        Experience,
-        on_delete=models.CASCADE,
-        related_name='acquiredSkills'
+class Job(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    companyName = models.CharField(
+        max_length=32
+    )
+    title = models.CharField(
+        max_length=32
+    )
+    type = models.CharField(
+        max_length=32,
+        default=''
+    )
+    qualification = models.CharField(
+        max_length=32,
+        default=''
+    )
+    workLocation = models.CharField(
+        max_length=32
+    )
+    designation = models.CharField(
+        max_length=32
+    )
+    industry = models.CharField(
+        max_length=32
+    )
+    department = models.CharField(
+        max_length=32
+    )
+    functionalArea = models.CharField(
+        max_length=32
+    )
+    role = models.CharField(
+        max_length=32
+    )
+    scope = models.CharField(
+        max_length=32
+    )
+    expRange = models.CharField(
+        max_length=32
+    )
+    salaryRange = models.CharField(
+        max_length=32
+    )
+    joining = models.CharField(
+        max_length=32
+    )
+    docRequired = models.CharField(
+        max_length=128
+    )
+    evaluationMandatory = models.BooleanField()
+    jobDescription = models.TextField(
+        max_length=1024
+    )
+
+    def __str__(self):
+        return '{} - {}'.format(self.title, self.companyName)
+
+
+class JobSkillSet(models.Model):
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.CASCADE
     )
     name = models.CharField(
         max_length=32

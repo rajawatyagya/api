@@ -1,0 +1,105 @@
+{% load i18n %}
+
+{% block subject %}
+{% blocktrans %}Account activation on {{ site_name }}{% endblocktrans %}
+{% endblock subject %}
+
+{% block html_body %}
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iboxz Registration Confirmation</title>
+</head>
+
+<body style="font-family: Montserrat , 'Open Sans',sans-serif; color: #666666; background:white; text-decoration: none;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" summary="">
+    <tr align="center">
+      <td style="height: 30px; width: 100%;">&nbsp;</td>
+    </tr>
+    <tr align="center">
+      <td valign="top" style="width: 100%;">
+        <table cellspacing="0" cellpadding="0" border="0" summary="">
+          <tr align="center">
+            <td valign="middle" style="width: 100%;">
+              <a href="https://iboxz.in" style="text-decoration: none;">
+                <span style="font-size: 4rem; font-stretch: extra-expanded; color: #00478F">iboxz</span>
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr align="center">
+      <td style="height: 50px; width: 100%;">&nbsp;</td>
+    </tr>
+    <tr align="center">
+      <td valign="top" style="width: 100%;">
+        <table style="padding: 0; border: 0; max-width: 520px; text-align: center;"
+               width="100%" cellpadding="0" cellspacing="0" border="0" summary="">
+          <tr align="center">
+            <td style="width: 100%; margin: 0 10px; line-height: 24px; font-size: 14pt; font-weight: bold; color: #333333;">
+              <p style="margin: 0; padding: 0;">Verify your email address</p>
+            </td>
+          </tr>
+          <tr align="center" style="margin: 0 10px;">
+            <td style="width: 100%; line-height: 24px; font-size: 11pt;">
+              <p>Why? So you can login and kick-start your career.</p>
+            </td>
+          </tr>
+          <tr align="center">
+            <td style="height: 30px; width: 100%;">&nbsp;</td>
+          </tr>
+          <tr align="center">
+            <td style="width: 100%; margin: 0 10px; line-height: 24px; font-size: 11pt;">
+              <a style="padding: 10px 20px; border: 1px solid #1492ef; -webkit-border-radius: 999em;
+              -moz-border-radius: 999em; border-radius: 999em; line-height: 24px; font-size: 11pt;
+              background-color: #1492ef; color: white; text-decoration: none;"
+              href="{{ protocol }}://localhost:4200/{{ url|safe }}">Verify your email</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 55px; width: 100%;">&nbsp;</td>
+          </tr>
+        </table>
+{#        <table style="border-collapse:collapse; max-width: 520px; text-align: center;"#}
+{#               cellpadding="0" cellspacing="0" border="0" summary="">#}
+{#          <tr>#}
+{#            <td style="height: 50px; width: 100%;">&nbsp;</td>#}
+{#          </tr>#}
+{#          <tr align="center">#}
+{#            <td style="width: 100%;">#}
+{#              <p style="line-height: 20px; font-size: 10pt; color: #b3b3b3;">Get the iboxz app:</p>#}
+{#            </td>#}
+{#          </tr>#}
+{#          <tr align="center">#}
+{#            <td style="width: 100%;">#}
+{#              <a href="" style="text-decoration:none;">#}
+{#                <img width="135" height="40" style="border: 0; width: 135px; height: 40px; margin-left: 3px;#}
+{#                margin-right: 0;" src="" alt="Android app"#}
+{#                  title="Android app">#}
+{#              </a>#}
+{#            </td>#}
+{#          </tr>#}
+{#          <tr>#}
+{#            <td style="height: 55px; width: 100%;">&nbsp;</td>#}
+{#          </tr>#}
+{#          <tr align="center">#}
+{#            <td style="width: 100%;">#}
+{#              <p style="line-height: 20px; font-size: 9pt; color: #b3b3b3;">Sent by#}
+{#                <a href="https://iboxz.in" style="color: #1492ef; text-decoration: none;">iboxz</a>#}
+{#              </p>#}
+{#            </td>#}
+{#          </tr>#}
+{#        </table>#}
+      </td>
+    </tr>
+    <tr align="center">
+      <td style="height: 55px; width: 100%;">&nbsp;</td>
+    </tr>
+  </table>
+</body>
+
+</html>
+
+{% endblock html_body %}

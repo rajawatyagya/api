@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'djoser',
+    'django_cleanup.apps.CleanupConfig',
     'api'
 ]
 
@@ -81,45 +83,16 @@ AUTH_USER_MODEL = "api.User"
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'db.sqlite3',
-#         # 'USER': 'iboxz_db_admin',
-#         # 'PASSWORD': 'chigga@2020',
-#         # 'HOST': 'localhost',
-#         # 'PORT': '',
-#     }
-# }
-
-# [START db_setup]
-if os.getenv('IBOXZ_BACKEND', None):
-    # Running on production App Engine, so connect to Google Cloud SQL using
-    # the unix socket at /cloudsql/<your-cloudsql-connection string>
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '10.127.112.4',
-            'NAME': 'iboxz-test',
-            'USER': 'iboxz_admin',
-            'PASSWORD': 'chigga@2020',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
+        # 'USER': 'iboxz_db_admin',
+        # 'PASSWORD': 'chigga@2020',
+        # 'HOST': 'localhost',
+        # 'PORT': '',
     }
-else:
-    # Running locally so connect to either a local MySQL instance or connect
-    # to Cloud SQL via the proxy.  To start the proxy via command line:
-    #    $ ./cloud_sql_proxy -instances=iboxz-database:us-west2:iboxz-db=tcp:3306
-    # See https://cloud.google.com/sql/docs/mysql-connect-proxy
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'HOST': '34.94.197.87',
-            'NAME': 'iboxz-test',
-            'USER': 'iboxz_admin',
-            'PASSWORD': 'chigga@2020',
-        }
-    }
-# [END db_setup]
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': {
@@ -166,6 +139,35 @@ USE_TZ = True
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 AUDIO_ROOT = os.path.join(BASE_DIR, 'api', 'algorithm', 'audioData', 'myprosody', 'dataset', 'audioFiles')
+
+# Custom Settings
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'contact@iboxz.in'
+EMAIL_HOST = 'smtpout.secureserver.net'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'contact@iboxz.in'
+EMAIL_HOST_PASSWORD = 'Praveen12.'
+EMAIL_USE_SSL = True
+
+DJOSER = {
+    'SET_PASSWORD_RETYPE': True,
+    'DOMAIN': 'iboxz.in',
+    'SITE_NAME': 'iboxz',
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate?id={uid}&key={token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SEND_CONFIRMATION_EMAIL': True,
+    'LOGIN_AFTER_ACTIVATION': True,
+    'SERIALIZERS': {
+        'user_registration': 'api.serializers.UserMiniSerializer',
+    },
+    'EMAIL': {
+        'activation': 'api.email.CustomActivationEmail'
+    },
+    'USER_CREATE_PASSWORD_RETYPE': True
+}

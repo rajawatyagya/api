@@ -1,6 +1,7 @@
 from rest_framework import serializers, status
 from rest_framework.authtoken.models import Token
 
+
 from api import models
 
 
@@ -12,6 +13,8 @@ class UserMiniSerializer(serializers.ModelSerializer):
             'id',
             'username',
             'password',  # password needs to be hashed
+            'email',
+            'user_type'
         )
         extra_kwargs = {
             'password': {
@@ -26,6 +29,14 @@ class UserMiniSerializer(serializers.ModelSerializer):
         return user
 
 
+class CandidateImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Candidate
+        fields = (
+            'image',
+        )
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
@@ -38,29 +49,6 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
 
-class MovieSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Movie
-        fields = (
-            'id',
-            'title',
-            'description',
-            'number_of_ratings',
-            'avg_rating'
-        )
-
-
-class RatingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Rating
-        fields = (
-            'id',
-            'stars',
-            'user',
-            'movie'
-        )
-
-
 class EvaluationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Evaluation
@@ -70,18 +58,6 @@ class EvaluationSerializer(serializers.ModelSerializer):
 class LanguagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Languages
-        fields = '__all__'
-
-
-class ImplementedSkillSetDataSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.ImplementedSkillSetData
-        fields = '__all__'
-
-
-class AcquiredSkillSetDataSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.AcquiredSkillSetData
         fields = '__all__'
 
 
@@ -112,8 +88,6 @@ class ExperienceCreateSerializer(serializers.ModelSerializer):
 
 
 class ExperienceSerializer(serializers.ModelSerializer):
-    implementedSkills = ImplementedSkillSetDataSerializer(many=True)
-    acquiredSkills = AcquiredSkillSetDataSerializer(many=True)
 
     class Meta:
         model = models.Experience
@@ -126,8 +100,6 @@ class ExperienceSerializer(serializers.ModelSerializer):
             'functionalArea',
             'role',
             'scope',
-            'implementedSkills',
-            'acquiredSkills',
             'summary',
             'startDate',
             'endDate',
@@ -146,6 +118,24 @@ class ExperienceSerializer(serializers.ModelSerializer):
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.AddressData
+        fields = '__all__'
+
+
+class CandidateSkillSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CandidateSkillSet
+        fields = '__all__'
+
+
+class JobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Job
+        fields = '__all__'
+
+
+class JobSkillSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.JobSkillSet
         fields = '__all__'
 
 
