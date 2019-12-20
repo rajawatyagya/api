@@ -116,7 +116,7 @@ class AddressData(models.Model):
         blank=True,
         null=True
     )
-    type = models.CharField(
+    address_type = models.CharField(
         max_length=32,
         blank=True,
         null=True,

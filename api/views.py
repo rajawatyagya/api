@@ -128,11 +128,48 @@ class CandidateViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
 
+def changeAddressData(savefrom, saveto):
+    saveto.addressLine1 = savefrom.addressLine1
+    saveto.addressLine2 = savefrom.addressLine2
+    saveto.city = savefrom.city
+    saveto.state = savefrom.state
+    saveto.zipCode = savefrom.zipCode
+    saveto.country = savefrom.country
+    saveto.address_type = savefrom.address_type
+    return saveto
+
+
 class AddressViewSet(viewsets.ModelViewSet):
     queryset = models.AddressData.objects.all()
     serializer_class = serializers.AddressSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
+    @action(detail=True, methods=['POST'])
+    def save_address(self, request, pk=None):
+        user = models.User.objects.get(id=pk)
+
+        if 'address_type' in request.data:
+            if request.data['address_type'] == 'permanent':
+                address = changeAddressData(request.data,
+                                            models.AddressData.objects.get(user=user.id,
+                                                                           address_type=request.data[
+                                                                               'address_type']))
+                serializer = serializers.AddressSerializer(address, many=False)
+                response = {'message': 'Address Updated', 'result': serializer.data}
+                return Response(response, status=status.HTTP_200_OK)
+            else:
+                address = changeAddressData(request.data,
+                                            models.AddressData.objects.get(user=user.id,
+                                                                           address_type=request.data[
+                                                                               'address_type']))
+                serializer = serializers.AddressSerializer(address, many=False)
+                response = {'message': 'Address Updated', 'result': serializer.data}
+                return Response(response, status=status.HTTP_200_OK)
+
+        else:
+            response = {'message': 'Address Data Needed'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EducationViewSet(viewsets.ModelViewSet):
