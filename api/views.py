@@ -148,6 +148,8 @@ class AddressViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['POST'])
     def save_address(self, request, pk=None):
         user = models.User.objects.get(id=pk)
+        present_data = request.data['presentAddress']
+        permanent_data = request.data['permanentAddress']
 
         if 'address_type' in request.data:
             if request.data['address_type'] == 'permanent':

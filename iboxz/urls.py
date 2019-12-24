@@ -21,6 +21,6 @@ from api.views import CustomAuthToken
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    path('alina/', include('api.urls')),
     path('auth/', CustomAuthToken.as_view()),
 ]
