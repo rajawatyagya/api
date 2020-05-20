@@ -13,7 +13,7 @@ djangorestframework==3.11.0
 google-auth==1.8.2
 google-auth-oauthlib==0.4.1
 googleads==22.0.0
-httplib2==0.14.0
+httplib2==0.18.0
 idna==2.8
 isodate==0.6.0
 lxml==4.4.2
